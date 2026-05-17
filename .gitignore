@@ -1,0 +1,6 @@
+__pycache__/
+*.py[cod]
+.venv/
+model.joblib
+.pytest_cache/
+.vscode/
