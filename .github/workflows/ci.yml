@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, lab3-monitoring]
   pull_request:
     branches: [main]
 
