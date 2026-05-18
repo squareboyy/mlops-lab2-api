@@ -1,0 +1,11 @@
+global:
+  scrape_interval: 10s # Як часто знімати метрики
+
+scrape_configs:
+  - job_name: "ml-api"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["ml-api:8000"] # DNS-ім'я сервісу в мережі docker
+        labels:
+          service: "iris-classifier"
+          env: "lab"

@@ -1,0 +1,31 @@
+import numpy as np
+from app.drift import DriftDetector
+
+FEATURE_NAMES = ["sepal_length", "sepal_width", "petal_length", "petal_width"]
+
+def test_no_drift_on_same_distribution():
+    """Санітарна перевірка: на однакових розподілах дрифту бути не повинно."""
+    rng = np.random.default_rng(42) 
+    ref = rng.normal(loc=5.0, scale=1.0, size=(500, 4)) 
+    cur = rng.normal(loc=5.0, scale=1.0, size=(500, 4))
+    
+    detector = DriftDetector(ref, FEATURE_NAMES)
+    result = detector.detect(cur, alpha=0.05)
+    
+    assert result["drift_detected"] is False 
+    assert result["n_drifted_features"] == 0 
+
+def test_drift_on_shifted_distribution():
+    """Перевірка: сильний зсув середнього має бути виявлений KS-тестом."""
+    rng = np.random.default_rng(42) 
+    ref = rng.normal(loc=5.0, scale=1.0, size=(500, 4))
+    # Зсуваємо середнє з 5.0 до 8.0 
+    cur = rng.normal(loc=8.0, scale=1.0, size=(500, 4))
+    
+    detector = DriftDetector(ref, FEATURE_NAMES)
+    result = detector.detect(cur, alpha=0.05)
+    
+    assert result["drift_detected"] is True 
+    assert result["n_drifted_features"] == 4 
+    for feat in FEATURE_NAMES:
+        assert result["per_feature"][feat]["p_value"] < 0.05 
